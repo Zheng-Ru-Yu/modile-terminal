@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>照片墙</title>
+	<style>
+	*{
+		padding: 0;
+		margin: 0;
+	}
+	img{
+		border: 0;
+	}
+	ul{
+		list-style: none;
+	}
+	body{
+		background: #000;
+	}
+	#container li{
+		margin-right: 2px;
+		margin-top: 2px;
+		float: left;		
+	}
+	.small-img{
+		display: block;
+		
+	}
+	#container li:nth-child(4n){
+		margin-right: 0;
+
+	}
+	#big-img{
+		width: 100%;
+		height: 100%;
+		background: #000;
+		position: absolute;
+		display: none; 
+	}
+	</style>
+</head>
+<body>
+
+	<ul id="container"></ul>
+	<div id="big-img"></div>
+<script src="js/zepto.min.js" ></script>
+	<script>
+	$(function(){
+		var $container=$('#container');
+		var $bigImg=$('#big-img');
+		var NUM = 16;
+		var n=0;
+		var nowIdx=1;
+		for(i=0;i<NUM;i++){
+			var img=new Image();
+			img.onload=function(){
+				n++;
+				if(n==NUM){
+					loadSuccess();
+				}
+			};
+			img.src= 'img/' + (i + 1) + '.jpg';
+		}
+
+		function loadSuccess(){
+			
+			for (var i = 0; i < NUM; i++) {
+				$container.append("<li><img class='small-img' src='img/"+(i+1)+".jpg'/></li>");
+			}
+				var $smallImg = $('.small-img');//为什么不能从loadSuccess里拿出来 因为图片还没加载完就取出$smallImg
+				var iClientWidth=$(document.body).width();//为什么不能放到上面var 因为图片加载后会出现滚动条
+				
+				 $smallImg.css({
+					width:parseInt((iClientWidth-6)/4),
+					height:parseInt((iClientWidth-6)/4)
+					});
+				$smallImg.on('tap',function(){
+					nowIdx = $(this).parent().index()+1;
+					$container.hide();
+					$bigImg.show();
+					var src=$(this).attr('src').split('.')[0]+'.large.jpg';
+					changeImg(src);
+					
+				});
+				$bigImg.on('tap',function(){
+					$bigImg.hide().css('background', '');//清空一下之间的图片
+					$container.show();
+
+				}).on('swipeLeft',function(){
+					nowIdx++;
+					console.log(this.src);
+					if (nowIdx == NUM+1) {
+						nowIdx = 1;
+
+					}
+					var src='img/'+nowIdx+'.large.jpg';
+					changeImg(src);
+				}).on('swipeRight',function(){
+					nowIdx--;
+					console.log(this.src);
+					if (nowIdx == 0){
+						nowIdx = NUM;
+						
+					}
+					var src='img/'+nowIdx+'.large.jpg';
+					changeImg(src);
+
+				});
+				function changeImg(src){
+
+					console.log(src);
+					var bigimg=new Image();
+					bigimg.onload=function(){
+						$bigImg.css({
+							background:'url('+src+') no-repeat center' ,
+							backgroundSize:'contain'
+						});
+						
+					};
+					
+					bigimg.src=src;
+
+				};
+
+		};
+		
+		
+
+			// $container.on('tap', 'li', function(){
+			// 	nowIdx = $(this).index();
+			// 	$container.hide();
+			// 	// $largeImg.show();
+			// 	var src = $(this).children().attr('src').split('.')[0] + '.large.jpg';
+			// 	// changeImg(src);
+			// });
+		
+
+});
+	
+
+
+</script>
+</body>
+</html>
